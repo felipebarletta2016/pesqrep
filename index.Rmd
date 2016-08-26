@@ -1,0 +1,12 @@
+---
+title: "Minha pesquisa reproduzível"
+output:
+  html_document:
+    toc: false
+---
+
+# Uma página de pesquisa reproduzível
+
+Aqui você poderá disponibilizar facilmente uma página com um documento
+dinâmico em R Markdown, os dados e demais arquivos necessários para
+tornar sua pesquisa reproduzível.

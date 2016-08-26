@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Fernando Mayer" />
+
+
+<title>Regressão linear simples: um exemplo</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="site_libs/highlight/default.css"
+      type="text/css" />
+<script src="site_libs/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.9em;
+  padding-left: 5px;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+  padding-left: 10px;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">PR</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="analise.html">Análise</a>
+</li>
+<li>
+  <a href="dados.html">Dados</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Regressão linear simples: um exemplo</h1>
+<h4 class="author"><em>Fernando Mayer</em></h4>
+<h4 class="date"><em>Agosto, 2016</em></h4>
+
+</div>
+
+
+<div id="definficao-do-modelo" class="section level1">
+<h1><span class="header-section-number">1</span> Definfição do modelo</h1>
+<p>Abaixo tem-se o ajuste do modelo de regressão linear simples</p>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 x + \epsilon
+\]</span></p>
+<p>para dados de distância para parada completa de um veículo em função da velocidade no instante de acionamento dos freios. Esse conjunto de dados está objeto <code>cars</code>.</p>
+</div>
+<div id="resumo-dos-dados" class="section level1">
+<h1><span class="header-section-number">2</span> Resumo dos dados</h1>
+<p>Um resumo dos dados pode ser visto na tabela abaixo:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="center">speed</th>
+<th align="center">dist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">Min. : 4.0</td>
+<td align="center">Min. : 2.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">1st Qu.:12.0</td>
+<td align="center">1st Qu.: 26.00</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">Median :15.0</td>
+<td align="center">Median : 36.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">Mean :15.4</td>
+<td align="center">Mean : 42.98</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">3rd Qu.:19.0</td>
+<td align="center">3rd Qu.: 56.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">Max. :25.0</td>
+<td align="center">Max. :120.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ajuste-do-modelo" class="section level1">
+<h1><span class="header-section-number">3</span> Ajuste do modelo</h1>
+<p>Os parâmetros do modelo linear podem ser obtidos pela função <code>lm()</code>, como pode ser visto abaixo</p>
+<pre class="r"><code>## Ajuste do modelo
+mod &lt;- lm(dist ~ speed, data = cars)</code></pre>
+<p>Um resumo do ajuste do modelo pode ser visualizado abaixo</p>
+<pre class="r"><code>## Resumo do modelo
+summary(mod)</code></pre>
+<pre><code>
+Call:
+lm(formula = dist ~ speed, data = cars)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-29.069  -9.525  -2.272   9.215  43.201 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -17.5791     6.7584  -2.601   0.0123 *  
+speed         3.9324     0.4155   9.464 1.49e-12 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 15.38 on 48 degrees of freedom
+Multiple R-squared:  0.6511,    Adjusted R-squared:  0.6438 
+F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12</code></pre>
+</div>
+<div id="analise-dos-residuos" class="section level1">
+<h1><span class="header-section-number">4</span> Análise dos resíduos</h1>
+<p>Antes de interpretar o modelo e fazer inferência, é importante que sejam verificados os pressupostos considerados através da análise dos resíduos.</p>
+<p>Por padrão se fizermos um <code>plot()</code> no modelo, temos os seguintes gráficos para avliar os resíduos:</p>
+<pre class="r"><code>plot(mod)</code></pre>
+<p><img src="analise_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="predicao" class="section level1">
+<h1><span class="header-section-number">5</span> Predição</h1>
+<p>Assumindo que o ajuste do modelo está adequado, pode-se obter o gráfico dos valores preditos sobre o diagrama de dispersão dos valores observados.</p>
+<pre class="r"><code>## Intervalo de valores para predição
+pred &lt;- data.frame(speed = seq(4, 25, by = 0.5))
+## Valores preditos
+ypred &lt;- predict(mod, newdata = pred, interval = &quot;confidence&quot;)
+## Inclui valores preditos no data frame
+pred &lt;- cbind(pred, ypred)</code></pre>
+<p>Agora podemos visualizar o modelo ajustado aos dados</p>
+<pre class="r"><code>## Gráfico de dispersão
+plot(dist ~ speed, data = cars,
+     xlab = &quot;Velocidade ao acionar os freios&quot;,
+     ylab = &quot;Distância para parada completa&quot;)
+## Intervalo de predição
+with(pred,
+     matlines(x = speed, y = cbind(fit, lwr, upr),
+              lty = c(1, 2, 2), col = 1))</code></pre>
+<p><img src="analise_files/figure-html/unnamed-chunk-9-1.png" width="480" /></p>
+<p>O parâmetro <span class="math inline">\(\beta_1\)</span> desse modelo de regressão linear simples é 3.9324088.</p>
+<p>Separe multiplas citações com <code>;</code>, por exemplo <span class="citation">(Buckland et al. 2004; Valpine 2004)</span>.</p>
+<p>Você pode adicionar comentários arbitrários dentro do colchetes, como por exemplo <span class="citation">(veja Durbin and Koopman 1997, 33–35; e Kitagawa 1987, cap. 1)</span>.</p>
+<p>Remova os colchetes para criar citações no texto com <span class="citation">Lele, Dennis, and Lutscher (2007)</span>, ou <span class="citation">Meinhold and Singpurwalla (2016, 5)</span>.</p>
+</div>
+<div id="referencias" class="section level1 unnumbered">
+<h1>Referências</h1>
+<div id="refs" class="references">
+<div id="ref-Buckland2004">
+<p>Buckland, S.T., K.B. Newman, L. Thomas, and N.B. Koesters. 2004. “State-space models for the dynamics of wild animal populations.” <em>Ecological Modelling</em> 171 (1-2): 157–75. doi:<a href="https://doi.org/10.1016/j.ecolmodel.2003.08.002">10.1016/j.ecolmodel.2003.08.002</a>.</p>
+</div>
+<div id="ref-Durbin1997">
+<p>Durbin, J., and S. Koopman. 1997. “Monte Carlo maximum likelihood estimation for non-Gaussian state space models.” <em>Biometrika</em> 84 (3): 669–84. <a href="http://eprints.ucl.ac.uk/18394/" class="uri">http://eprints.ucl.ac.uk/18394/</a>.</p>
+</div>
+<div id="ref-Kitagawa1987">
+<p>Kitagawa, G. 1987. “Non-Gaussian State-Space Modeling on Nonstationary Time Series.” <em>Journal of the American Statistical Association</em> 82 (400): 1032–63.</p>
+</div>
+<div id="ref-Lele2007">
+<p>Lele, Subhash R, Brian Dennis, and Frithjof Lutscher. 2007. “Data cloning: easy maximum likelihood estimation for complex ecological models using Bayesian Markov chain Monte Carlo methods.” <em>Ecology Letters</em> 10 (7): 551–63. doi:<a href="https://doi.org/10.1111/j.1461-0248.2007.01047.x">10.1111/j.1461-0248.2007.01047.x</a>.</p>
+</div>
+<div id="ref-Meinhold2016">
+<p>Meinhold, Richard J, and Nozer D Singpurwalla. 2016. “Understanding the Kalman Filter.” <em>The American Statistician</em> 37 (2): 123–27.</p>
+</div>
+<div id="ref-DeValpine2004">
+<p>Valpine, Perry de. 2004. “Monte Carlo State-Space Likelihoods by Weighted Posterior Kernel Density Estimation.” <em>Journal of the American Statistical Association</em> 99 (466): 523–36. doi:<a href="https://doi.org/10.1198/016214504000000476">10.1198/016214504000000476</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

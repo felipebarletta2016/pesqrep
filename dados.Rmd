@@ -1,0 +1,15 @@
+---
+title: "Dados utilizados"
+output:
+  html_document:
+    toc: false
+---
+
+Os dados estão disponíveis neste endereço.
+
+As 10 primeiras linhas da base de dados podem ser visualizadas abaixo:
+
+```{r, results="asis", echo=FALSE}
+## Resumo dos dados
+knitr::kable(head(cars, 10))
+```
